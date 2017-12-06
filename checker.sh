@@ -2,8 +2,8 @@
 
 DIRECTORY=${1%/}
 
-REQUIRED_TAGS=("ALBUM", "ARTIST", "DATE", "DISCNUMBER", "DISCTOTAL", "GENRE", "TITLE", "TRACKNUMBER", "TRACKTOTAL")
-OPTIONAL_TAGS=("ALBUMARTIST", "COMMENT", "DISCID", "DISCSUBTITLE")
+REQUIRED_TAGS=("ALBUM" "ARTIST" "DATE" "GENRE" "TITLE" "TRACKNUMBER" "TRACKTOTAL")
+OPTIONAL_TAGS=("ALBUMARTIST" "COMMENT" "DISCID" "DISCNUMBER" "DISCSUBTITLE" "DISCTOTAL")
 
 if [ ! -d "$DIRECTORY" ]; then
     echo "${DIRECTORY} is not a directory"
@@ -14,30 +14,21 @@ IFS=$'\n' # split only on newline
 for x in `find ${DIRECTORY} -type f -name *.flac`
 do
     TAGS=`metaflac --export-tags-to=- "${x}"`
-    NUM_REQ_TAGS=0
+
+    # check for unexpected tags
     while read -r TAG; do
-        [[ "${TAG}" =~ ^([a-zA-Z]+)\=.*$ ]] &&
+        [[ "${TAG}" =~ ^([a-zA-Z ]+)\=.*$ ]] &&
         TAG_NAME="${BASH_REMATCH[1]}"
-
-        # check for unexpected tags
-        if [[ ! "${REQUIRED_TAGS[@]}" =~ "${TAG_NAME}" && ! "${OPTIONAL_TAGS[@]}" =~ "${TAG_NAME}" ]]; then
-            echo "${TAG_NAME} # ${x}"
+        if [[ ! "${REQUIRED_TAGS[*]}" =~ "${TAG_NAME}" && ! "${OPTIONAL_TAGS[@]}" =~ "${TAG_NAME}" ]]; then
+            printf "UNEXPECTED TAG # %-15s # %s\n" ${TAG_NAME} ${x}
         fi
-
-        if [[ "${REQUIRED_TAGS[@]}" =~ "${TAG_NAME}" ]]; then
-            NUM_REQ_TAGS=$((NUM_REQ_TAGS+1))
-        fi
-
-        # check for missing required tags
-        for R_TAG in REQUIRED_TAGS
-        do
-            if [[ ! "${REQUIRED_TAGS[@]}" =~ "${TAG_NAME}" ]]; then
-                :
-            fi
-        done
     done <<< "$TAGS"
 
-    if [[ ${NUM_REQ_TAGS} < ${#REQUIRED_TAGS[@]} ]]; then
-        echo "MISSING # ${x}"
-    fi
+    # check for missing required tags
+    for R_TAG in "${REQUIRED_TAGS[@]}"
+    do
+        if [[ ! "${TAGS[@]}" =~ "${R_TAG}" ]]; then
+            printf "MISSING TAG    # %-15s # %s\n" ${R_TAG} ${x}
+        fi
+    done
 done
