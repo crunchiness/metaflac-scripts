@@ -14,7 +14,10 @@ IFS=$'\n' # Split only on newline
 for x in `find ${DIRECTORY} -type f -name *.flac`
 do
     TAGS=`metaflac --export-tags-to=- "${x}"`
-
+    ARTIST=""
+    DISCNUMBER=""
+    TITLE=""
+    TRACKNUMBER=""
     while read -r TAG; do
         [[ "${TAG}" =~ ^([a-zA-Z ]+)\=(.*)$ ]] &&
         TAG_NAME="${BASH_REMATCH[1]}"
@@ -49,16 +52,36 @@ do
 
     # Extract metadata from filename
     FILENAME=$(basename ${x})
-    if [[ "${FILENAME}" =~ ^([0-9]+)\.\ (.+)\ -\ (.+)\.flac$ ]]; then
+    if [[ "${FILENAME}" =~ ^([0-9]+)\.\ (.+)\ -\ (.+\ -\ .+\ -\ .+)\.flac$ ]]; then
+        N_DISCNUMBER=""
         N_TRACKNUMBER=${BASH_REMATCH[1]}
         N_ARTIST=${BASH_REMATCH[2]}
         N_TITLE=${BASH_REMATCH[3]}
-    else if [[ "${FILENAME}" =~ ^([0-9]+)\ -\ ([0-9]+)\.\ (.+)\ -\ (.+)\.flac$ ]]; then
+    elif [[ "${FILENAME}" =~ ^([0-9]+)\.\ (.+)\ -\ (.+\ -\ .+)\.flac$ ]]; then
+        N_DISCNUMBER=""
+        N_TRACKNUMBER=${BASH_REMATCH[1]}
+        N_ARTIST=${BASH_REMATCH[2]}
+        N_TITLE=${BASH_REMATCH[3]}
+    elif [[ "${FILENAME}" =~ ^([0-9]+)\.\ (.+)\ -\ (.+)\.flac$ ]]; then
+        N_DISCNUMBER=""
+        N_TRACKNUMBER=${BASH_REMATCH[1]}
+        N_ARTIST=${BASH_REMATCH[2]}
+        N_TITLE=${BASH_REMATCH[3]}
+    elif [[ "${FILENAME}" =~ ^([0-9]+)\ -\ ([0-9]+)\.\ (.+)\ -\ (.+\ -\ .+\ -\ .+)\.flac$ ]]; then
         N_DISCNUMBER=${BASH_REMATCH[1]}
         N_TRACKNUMBER=${BASH_REMATCH[2]}
         N_ARTIST=${BASH_REMATCH[3]}
         N_TITLE=${BASH_REMATCH[4]}
-        fi
+    elif [[ "${FILENAME}" =~ ^([0-9]+)\ -\ ([0-9]+)\.\ (.+)\ -\ (.+\ -\ .+)\.flac$ ]]; then
+        N_DISCNUMBER=${BASH_REMATCH[1]}
+        N_TRACKNUMBER=${BASH_REMATCH[2]}
+        N_ARTIST=${BASH_REMATCH[3]}
+        N_TITLE=${BASH_REMATCH[4]}
+    elif [[ "${FILENAME}" =~ ^([0-9]+)\ -\ ([0-9]+)\.\ (.+)\ -\ (.+)\.flac$ ]]; then
+        N_DISCNUMBER=${BASH_REMATCH[1]}
+        N_TRACKNUMBER=${BASH_REMATCH[2]}
+        N_ARTIST=${BASH_REMATCH[3]}
+        N_TITLE=${BASH_REMATCH[4]}
     fi
 
     # Remove preceding 0
@@ -66,16 +89,26 @@ do
     N_TRACKNUMBER=${BASH_REMATCH[1]}
 
     # Check for name/tags metadata mismatches
+    ARTIST=${ARTIST//\//-}
+    ARTIST=${ARTIST//:/-}
+    ARTIST=${ARTIST//\?/_}
+    ARTIST=${ARTIST//\"/}
     if [[ ${N_ARTIST} != ${ARTIST} ]]; then
-        echo "MISMATCH # ARTIST # ${N_ARTIST} # ${ARTIST}"
+        echo "MISMATCH # ARTIST # ${N_ARTIST} # ${ARTIST} # ${x}"
     fi
     if [[ ${N_DISCNUMBER} != ${DISCNUMBER} ]]; then
-        echo "MISMATCH # DISCNUMBER # ${N_DISCNUMBER} # ${DISCNUMBER}"
+        echo "MISMATCH # DISCNUMBER # ${N_DISCNUMBER} # ${DISCNUMBER} # ${x}"
     fi
-    if [[ ${N_TITLE} != ${TITLE} ]]; then
-        echo "MISMATCH # TITLE # ${N_TITLE} # ${TITLE}"
+    TITLE=${TITLE//\//-}
+    TITLE=${TITLE//:/-}
+    TITLE=${TITLE//\?/_}
+    TITLE=${TITLE//</_}
+    TITLE=${TITLE//>/_}
+    TITLE=${TITLE//\"/}
+    if [[ ${N_TITLE} != ${TITLE//\//-} ]]; then
+        echo "MISMATCH # TITLE # ${N_TITLE} # ${TITLE} # ${x}"
     fi
     if [[ ${N_TRACKNUMBER} != ${TRACKNUMBER} ]]; then
-        echo "MISMATCH # TRACKNUMBER # ${N_TRACKNUMBER} # ${TRACKNUMBER}"
+        echo "MISMATCH # TRACKNUMBER # ${N_TRACKNUMBER} # ${TRACKNUMBER} # ${x}"
     fi
 done
