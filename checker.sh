@@ -49,28 +49,30 @@ do
     TITLE=""
     TRACKNUMBER=""
     while read -r TAG; do
-        #TODO if
-        [[ "${TAG}" =~ ^([a-zA-Z _]+)\=(.*)$ ]] &&
-        TAG_NAME="${BASH_REMATCH[1]}"
+        if [[ "${TAG}" =~ ^([a-zA-Z _]+)\=(.*)$ ]]; then
+            TAG_NAME="${BASH_REMATCH[1]}"
 
-        # Save tags for filename check
-        if [[ "${TAG_NAME}" == "ALBUM" ]]; then
-            ALBUM="${BASH_REMATCH[2]}"
-        fi
-        if [[ "${TAG_NAME}" == "ALBUMARTIST" ]]; then
-            ALBUMARTIST="${BASH_REMATCH[2]}"
-        fi
-        if [[ "${TAG_NAME}" == "ARTIST" ]]; then
-            ARTIST="${BASH_REMATCH[2]}"
-        fi
-        if [[ "${TAG_NAME}" == "DISCNUMBER" ]]; then
-            DISCNUMBER="${BASH_REMATCH[2]}"
-        fi
-        if [[ "${TAG_NAME}" == "TITLE" ]]; then
-            TITLE="${BASH_REMATCH[2]}"
-        fi
-        if [[ "${TAG_NAME}" == "TRACKNUMBER" ]]; then
-            TRACKNUMBER="${BASH_REMATCH[2]}"
+            # Save tags for filename check
+            if [[ "${TAG_NAME}" == "ALBUM" ]]; then
+                ALBUM="${BASH_REMATCH[2]}"
+            fi
+            if [[ "${TAG_NAME}" == "ALBUMARTIST" ]]; then
+                ALBUMARTIST="${BASH_REMATCH[2]}"
+            fi
+            if [[ "${TAG_NAME}" == "ARTIST" ]]; then
+                ARTIST="${BASH_REMATCH[2]}"
+            fi
+            if [[ "${TAG_NAME}" == "DISCNUMBER" ]]; then
+                DISCNUMBER="${BASH_REMATCH[2]}"
+            fi
+            if [[ "${TAG_NAME}" == "TITLE" ]]; then
+                TITLE="${BASH_REMATCH[2]}"
+            fi
+            if [[ "${TAG_NAME}" == "TRACKNUMBER" ]]; then
+                TRACKNUMBER="${BASH_REMATCH[2]}"
+            fi
+        else
+            echo "STRANGE TAG ${TAG}"
         fi
 
         # Check for unexpected tags
