@@ -15,6 +15,19 @@ function string_equiv {
     fi
 }
 
+function remove_special_chars {
+    # Replace "/" and ":" with "-"
+    RESULT=${1//\//-}
+    RESULT=${RESULT//:/-}
+    # Replace "?", "<" and ">" with "_"
+    RESULT=${RESULT//\?/_}
+    RESULT=${RESULT//</_}
+    RESULT=${RESULT//>/_}
+    # Remove double quotes
+    RESULT=${RESULT//\"/}
+    echo "${RESULT}"
+}
+
 DIRECTORY=${1%/}
 
 REQUIRED_TAGS=("ALBUM" "ARTIST" "DATE" "GENRE" "TITLE" "TRACKNUMBER" "TRACKTOTAL")
@@ -104,25 +117,20 @@ do
     N_TRACKNUMBER=${BASH_REMATCH[1]}
 
     # Check for name/tags metadata mismatches
-    ARTIST=${ARTIST//\//-}
-    ARTIST=${ARTIST//:/-}
-    ARTIST=${ARTIST//\?/_}
-    ARTIST=${ARTIST//\"/}
-    if [[ "${N_ARTIST}" != "${ARTIST}" ]]; then
-        echo "MISMATCH # ARTIST # ${N_ARTIST} # ${ARTIST} # ${x}"
+    T_ARTIST=`remove_special_chars "${ARTIST}"`
+    if ! string_equiv "${N_ARTIST}" "${T_ARTIST}"; then
+        echo "MISMATCH # ARTIST # ${N_ARTIST} # ${T_ARTIST} # ${x}"
     fi
+
     if [[ "${N_DISCNUMBER}" != "${DISCNUMBER}" ]]; then
         echo "MISMATCH # DISCNUMBER # ${N_DISCNUMBER} # ${DISCNUMBER} # ${x}"
     fi
-    TITLE=${TITLE//\//-}
-    TITLE=${TITLE//:/-}
-    TITLE=${TITLE//\?/_}
-    TITLE=${TITLE//</_}
-    TITLE=${TITLE//>/_}
-    TITLE=${TITLE//\"/}
-    if ! string_equiv "${N_TITLE}" "${TITLE}"; then
+
+    T_TITLE=`remove_special_chars "${TITLE}"`
+    if ! string_equiv "${N_TITLE}" "${T_TITLE}"; then
         echo "MISMATCH # TITLE # ${N_TITLE} # ${TITLE} # ${x}"
     fi
+
     if [[ "${N_TRACKNUMBER}" != "${TRACKNUMBER}" ]]; then
         echo "MISMATCH # TRACKNUMBER # ${N_TRACKNUMBER} # ${TRACKNUMBER} # ${x}"
     fi
