@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+function string_equiv {
+    if [[ "$1" == "$2" ]]; then
+        return 0
+    fi
+
+    # else check if unicode strings are equivalent in different unicode normalization forms
+    local script=$(printf "# -*- coding: utf-8 -*-\nimport unicodedata\nif unicodedata.normalize('NFC', '"${1//\'/\\\\\'}"') == unicodedata.normalize('NFC', '"${2//\'/\\\\\'}"'):\n    print('Y')\nelse:\n    print('N')\n")
+    local result=`python3 -c "${script}"`
+    if [[ ${result} == "Y" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 DIRECTORY=${1%/}
 
 REQUIRED_TAGS=("ALBUM" "ARTIST" "DATE" "GENRE" "TITLE" "TRACKNUMBER" "TRACKTOTAL")
@@ -93,10 +108,10 @@ do
     ARTIST=${ARTIST//:/-}
     ARTIST=${ARTIST//\?/_}
     ARTIST=${ARTIST//\"/}
-    if [[ ${N_ARTIST} != ${ARTIST} ]]; then
+    if [[ "${N_ARTIST}" != "${ARTIST}" ]]; then
         echo "MISMATCH # ARTIST # ${N_ARTIST} # ${ARTIST} # ${x}"
     fi
-    if [[ ${N_DISCNUMBER} != ${DISCNUMBER} ]]; then
+    if [[ "${N_DISCNUMBER}" != "${DISCNUMBER}" ]]; then
         echo "MISMATCH # DISCNUMBER # ${N_DISCNUMBER} # ${DISCNUMBER} # ${x}"
     fi
     TITLE=${TITLE//\//-}
@@ -105,10 +120,10 @@ do
     TITLE=${TITLE//</_}
     TITLE=${TITLE//>/_}
     TITLE=${TITLE//\"/}
-    if [[ ${N_TITLE} != ${TITLE//\//-} ]]; then
+    if ! string_equiv "${N_TITLE}" "${TITLE}"; then
         echo "MISMATCH # TITLE # ${N_TITLE} # ${TITLE} # ${x}"
     fi
-    if [[ ${N_TRACKNUMBER} != ${TRACKNUMBER} ]]; then
+    if [[ "${N_TRACKNUMBER}" != "${TRACKNUMBER}" ]]; then
         echo "MISMATCH # TRACKNUMBER # ${N_TRACKNUMBER} # ${TRACKNUMBER} # ${x}"
     fi
 done
