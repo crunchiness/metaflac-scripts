@@ -42,15 +42,24 @@ IFS=$'\n' # Split only on newline
 for x in `find ${DIRECTORY} -type f -name *.flac`
 do
     TAGS=`metaflac --export-tags-to=- "${x}"`
+    ALBUM=""
+    ALBUMARTIST=""
     ARTIST=""
     DISCNUMBER=""
     TITLE=""
     TRACKNUMBER=""
     while read -r TAG; do
-        [[ "${TAG}" =~ ^([a-zA-Z ]+)\=(.*)$ ]] &&
+        #TODO if
+        [[ "${TAG}" =~ ^([a-zA-Z _]+)\=(.*)$ ]] &&
         TAG_NAME="${BASH_REMATCH[1]}"
 
         # Save tags for filename check
+        if [[ "${TAG_NAME}" == "ALBUM" ]]; then
+            ALBUM="${BASH_REMATCH[2]}"
+        fi
+        if [[ "${TAG_NAME}" == "ALBUMARTIST" ]]; then
+            ALBUMARTIST="${BASH_REMATCH[2]}"
+        fi
         if [[ "${TAG_NAME}" == "ARTIST" ]]; then
             ARTIST="${BASH_REMATCH[2]}"
         fi
@@ -79,7 +88,7 @@ do
     done
 
     # Extract metadata from filename
-    FILENAME=$(basename ${x})
+    FILENAME=${x##*/}
     if [[ "${FILENAME}" =~ ^([0-9]+)\.\ (.+)\ -\ (.+\ -\ .+\ -\ .+)\.flac$ ]]; then
         N_DISCNUMBER=""
         N_TRACKNUMBER=${BASH_REMATCH[1]}
@@ -134,4 +143,30 @@ do
     if [[ "${N_TRACKNUMBER}" != "${TRACKNUMBER}" ]]; then
         echo "MISMATCH # TRACKNUMBER # ${N_TRACKNUMBER} # ${TRACKNUMBER} # ${x}"
     fi
+
+    # Check for folder name mismatches
+    if [[ "${ALBUMARTIST}" == "" ]]; then
+        ALBUMARTIST="${ARTIST}"
+    fi
+    T_ALBUMARTIST=`remove_special_chars "${ALBUMARTIST}"`
+    T_ALBUM=`remove_special_chars "${ALBUM}"`
+    FOLDER_NAME=${x%/*}
+    FOLDER_NAME=${FOLDER_NAME##*/}
+
+    if [[ ${FOLDER_NAME} =~ ^(.+)\ -\ (.+\ -\ .+)$ ]]; then
+        FOLDER_ARTIST="${BASH_REMATCH[1]}"
+        FOLDER_ALBUM="${BASH_REMATCH[2]}"
+    elif [[ ${FOLDER_NAME} =~ ^(.+)\ -\ (.+)$ ]]; then
+        FOLDER_ARTIST="${BASH_REMATCH[1]}"
+        FOLDER_ALBUM="${BASH_REMATCH[2]}"
+    else
+        echo "DOES NOT MATCH ${FOLDER_NAME}"
+    fi
+    if ! string_equiv "${FOLDER_ALBUM}" "${T_ALBUM}"; then
+        echo "ALBUM NAME MISMATCH # ${FOLDER_ALBUM} # ${T_ALBUM} # ${x}"
+    fi
+    if ! string_equiv "${FOLDER_ARTIST}" "${T_ALBUMARTIST}"; then
+        echo "ARTIST NAME MISMATCH # ${FOLDER_ARTIST} # ${T_ALBUMARTIST} # ${x}"
+    fi
+
 done
