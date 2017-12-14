@@ -8,7 +8,7 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 IFS=$'\n' # split only on newline
-for x in `find ${DIRECTORY} -type f -name *.flac`
+for x in `find ${DIRECTORY} -type f -name '*.flac'`
 do
     printf "Removing padding for: %s\n" $(basename ${x})
     metaflac --remove --block-type=PADDING --dont-use-padding "${x}"

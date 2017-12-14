@@ -8,7 +8,7 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 IFS=$'\n' # split only on newline
-for x in `find ${DIRECTORY} -type f -name *.flac`
+for x in `find ${DIRECTORY} -type f -name '*.flac'`
 do
     DISCNUMBER=`metaflac --show-tag=DISCNUMBER "${x}"`
     if [[ "${DISCNUMBER}" =~ ^DISCNUMBER\=([0-9]+)/([0-9]+)$ ]]; then

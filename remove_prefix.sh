@@ -8,7 +8,7 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 IFS=$'\n' # split only on newline
-for x in `find ${DIRECTORY} -type f -name *.flac`
+for x in `find ${DIRECTORY} -type f -name '*.flac'`
 do
     TRACKNUMBER=`metaflac --show-tag=TRACKNUMBER "${x}"`
     if [[ "${TRACKNUMBER}" =~ ^TRACKNUMBER\=0([0-9])$ ]]; then

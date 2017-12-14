@@ -28,10 +28,10 @@ function remove_special_chars {
     echo "${RESULT}"
 }
 
-DIRECTORY=${1%/}
-
 REQUIRED_TAGS=("ALBUM" "ARTIST" "DATE" "GENRE" "TITLE" "TRACKNUMBER" "TRACKTOTAL")
 OPTIONAL_TAGS=("ALBUMARTIST" "COMMENT" "DISCID" "DISCNUMBER" "DISCSUBTITLE" "DISCTOTAL")
+
+DIRECTORY=${1%/}
 
 if [ ! -d "$DIRECTORY" ]; then
     echo "${DIRECTORY} is not a directory"
@@ -39,7 +39,7 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 IFS=$'\n' # Split only on newline
-for x in `find ${DIRECTORY} -type f -name *.flac`
+for x in `find ${DIRECTORY} -type f -name '*.flac'`
 do
     TAGS=`metaflac --export-tags-to=- "${x}"`
     ALBUM=""
