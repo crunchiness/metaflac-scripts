@@ -19,8 +19,9 @@ function remove_special_chars {
     # Replace "/" and ":" with "-"
     RESULT=${1//\//-}
     RESULT=${RESULT//:/-}
-    # Replace "?", "<" and ">" with "_"
+    # Replace "?", "*", "<" and ">" with "_"
     RESULT=${RESULT//\?/_}
+    RESULT=${RESULT//\*/_}
     RESULT=${RESULT//</_}
     RESULT=${RESULT//>/_}
     # Remove double quotes

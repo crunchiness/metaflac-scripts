@@ -4,8 +4,9 @@ function remove_special_chars {
     # Replace "/" and ":" with "-"
     RESULT=${1//\//-}
     RESULT=${RESULT//:/-}
-    # Replace "?", "<" and ">" with "_"
+    # Replace "?", "*", "<" and ">" with "_"
     RESULT=${RESULT//\?/_}
+    RESULT=${RESULT//\*/_}
     RESULT=${RESULT//</_}
     RESULT=${RESULT//>/_}
     # Remove double quotes
@@ -52,6 +53,9 @@ do
 
     T_ARTIST=`remove_special_chars "${ARTIST}"`
     T_TITLE=`remove_special_chars "${TITLE}"`
-    mv "${x}" "${x%/*}/$(printf "%02d\n" ${TRACKNUMBER}). ${T_ARTIST} - ${T_TITLE}.flac"
-
+    if [[ -z "${DISCNUMBER}" ]]; then
+        mv "${x}" "${x%/*}/$(printf "%02d\n" ${TRACKNUMBER}). ${T_ARTIST} - ${T_TITLE}.flac"
+    else
+        mv "${x}" "${x%/*}/${DISCNUMBER} - $(printf "%02d\n" ${TRACKNUMBER}). ${T_ARTIST} - ${T_TITLE}.flac"
+    fi
 done
