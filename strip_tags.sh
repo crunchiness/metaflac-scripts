@@ -18,7 +18,7 @@ for x in `find "${DIRECTORY}" -type f -name '*.flac'`
 do
     TAGS=`metaflac --export-tags-to=- "${x}"`
     while read -r TAG; do
-        if [[ "${TAG}" =~ ^([a-zA-Z _]+)\=(.*)$ ]]; then
+        if [[ "${TAG}" =~ ^([a-zA-Z0-9 _]+)\=(.*)$ ]]; then
             TAG_NAME="${BASH_REMATCH[1]}"
         else
             echo "STRANGE TAG ${TAG}"
