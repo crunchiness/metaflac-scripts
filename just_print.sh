@@ -8,7 +8,7 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 IFS=$'\n' # split only on newline
-for x in `find "${DIRECTORY}" -type f -name '*.flac'`
+for x in `find "${DIRECTORY}" -type f -name '*.flac' | sort`
 do
     echo "${x}"
     metaflac --export-tags-to=- "${x}"
