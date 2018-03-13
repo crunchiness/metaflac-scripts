@@ -40,7 +40,7 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 IFS=$'\n' # Split only on newline
-for x in `find ${DIRECTORY} -type f -name '*.flac'`
+for x in `find "${DIRECTORY}" -type f -name '*.flac' | sort`
 do
     TAGS=`metaflac --export-tags-to=- "${x}"`
     ALBUM=""
