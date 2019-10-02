@@ -9,8 +9,6 @@ from os.path import basename
 
 from common import get_paths, remove_tag, set_tag
 
-ALLOWED_TAGS = ['ALBUM', 'ARTIST', 'DATE', 'GENRE', 'TITLE', 'TRACKNUMBER', 'TRACKTOTAL']
-
 
 def capitalize_tags(path: str):
     proc = subprocess.Popen(['metaflac', '--export-tags-to=-', path], stdout=subprocess.PIPE)

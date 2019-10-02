@@ -5,9 +5,7 @@ __author__ = "Ingvaras Merkys"
 import argparse
 from os.path import basename
 
-from common import get_paths, set_tag, read_tag
-
-ALLOWED_TAGS = ['ALBUM', 'ARTIST', 'DATE', 'GENRE', 'TITLE', 'TRACKNUMBER', 'TRACKTOTAL']
+from common import get_paths, set_tag, read_tag, ALLOWED_TAGS
 
 
 def change_tag(path: str, key: str, value: str) -> None:

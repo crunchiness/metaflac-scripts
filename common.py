@@ -5,6 +5,11 @@ from os.path import basename, isdir, isfile, join
 from typing import List
 
 
+REQUIRED_TAGS = ['ALBUM', 'ARTIST', 'DATE', 'GENRE', 'TITLE', 'TRACKNUMBER', 'TRACKTOTAL']
+OPTIONAL_TAGS = ['ALBUMARTIST', 'COMMENT', 'DISCID', 'DISCNUMBER', 'DISCSUBTITLE', 'DISCTOTAL']
+ALLOWED_TAGS = sorted(REQUIRED_TAGS + OPTIONAL_TAGS)
+
+
 def read_tag(path: str, tag: str) -> str:
     proc = subprocess.Popen(['metaflac', '--show-tag={}'.format(tag), path], stdout=subprocess.PIPE)
     output = io.TextIOWrapper(proc.stdout, encoding='utf-8').read().strip()
