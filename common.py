@@ -13,7 +13,7 @@ ALLOWED_TAGS = sorted(REQUIRED_TAGS + OPTIONAL_TAGS)
 def read_tag(path: str, tag: str) -> str:
     proc = subprocess.Popen(['metaflac', '--show-tag={}'.format(tag), path], stdout=subprocess.PIPE)
     output = io.TextIOWrapper(proc.stdout, encoding='utf-8').read().strip()
-    if output[:len(tag) + 1] == tag + '=':
+    if output[:len(tag) + 1].upper() == tag + '=':
         return output[len(tag) + 1:]
     else:
         raise Exception('Couldn\'t read tag "{}" on "{}"'.format(tag, basename(path)))
