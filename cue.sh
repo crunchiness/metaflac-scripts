@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-#sudo apt install shntool
-#sudo apt install cuetools
+# sudo apt install shntool cuetools
 
 shnsplit -o flac -f file.cue file.flac
 cuetag file.cue split-*.flac

@@ -40,9 +40,9 @@ if [ ! -d "$DIRECTORY" ]; then
 fi
 
 IFS=$'\n' # Split only on newline
-for x in `find "${DIRECTORY}" -type f -name '*.flac' | sort`
+for x in $(find "${DIRECTORY}" -type f -name '*.flac' | sort)
 do
-    TAGS=`metaflac --export-tags-to=- "${x}"`
+    TAGS=$(metaflac --export-tags-to=- "${x}")
     ALBUM=""
     ALBUMARTIST=""
     ARTIST=""
@@ -122,6 +122,9 @@ do
         N_TRACKNUMBER=${BASH_REMATCH[2]}
         N_ARTIST=${BASH_REMATCH[3]}
         N_TITLE=${BASH_REMATCH[4]}
+    else
+        echo "Could not parse filename \"${FILENAME}\"!"
+        continue
     fi
 
     # Remove preceding 0
@@ -129,8 +132,10 @@ do
     N_TRACKNUMBER=${BASH_REMATCH[1]}
 
     # Check for name/tags metadata mismatches
-    T_ARTIST=`remove_special_chars "${ARTIST}"`
+    T_ARTIST=$(remove_special_chars "${ARTIST}")
     if ! string_equiv "${N_ARTIST}" "${T_ARTIST}"; then
+        echo "FILENAME is ${FILENAME}"
+        echo "ARTIST is ${N_ARTIST}"
         echo "MISMATCH # ARTIST # ${N_ARTIST} # ${T_ARTIST} # ${x}"
     fi
 
@@ -138,7 +143,7 @@ do
         echo "MISMATCH # DISCNUMBER # ${N_DISCNUMBER} # ${DISCNUMBER} # ${x}"
     fi
 
-    T_TITLE=`remove_special_chars "${TITLE}"`
+    T_TITLE=$(remove_special_chars "${TITLE}")
     if ! string_equiv "${N_TITLE}" "${T_TITLE}"; then
         echo "MISMATCH # TITLE # ${N_TITLE} # ${TITLE} # ${x}"
     fi
@@ -151,8 +156,8 @@ do
     if [[ "${ALBUMARTIST}" == "" ]]; then
         ALBUMARTIST="${ARTIST}"
     fi
-    T_ALBUMARTIST=`remove_special_chars "${ALBUMARTIST}"`
-    T_ALBUM=`remove_special_chars "${ALBUM}"`
+    T_ALBUMARTIST=$(remove_special_chars "${ALBUMARTIST}")
+    T_ALBUM=$(remove_special_chars "${ALBUM}")
     FOLDER_NAME=${x%/*}
     FOLDER_NAME=${FOLDER_NAME##*/}
 

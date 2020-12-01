@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__author__ = "Ingvaras Merkys"
+__author__ = 'Ingvaras Merkys'
 
 import argparse
 import io
