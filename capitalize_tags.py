@@ -3,17 +3,14 @@
 __author__ = 'Ingvaras Merkys'
 
 import argparse
-import io
-import subprocess
+
 from os.path import basename
 
-from common import get_paths, remove_tag, set_tag
+from common import get_paths, remove_tag, set_tag, read_all_tags
 
 
 def capitalize_tags(path: str):
-    proc = subprocess.Popen(['metaflac', '--export-tags-to=-', path], stdout=subprocess.PIPE)
-    output = io.TextIOWrapper(proc.stdout, encoding='utf-8').read()
-    existing_tags = map(lambda x: tuple(x.split('=', 1)), filter(lambda x: '=' in x, output.split('\n')))
+    existing_tags = read_all_tags(path)
     for tag, value in existing_tags:
         capitalized_tag = tag.upper()
         if capitalized_tag == tag:
