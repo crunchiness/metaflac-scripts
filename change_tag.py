@@ -3,16 +3,26 @@
 __author__ = "Ingvaras Merkys"
 
 import argparse
+import logging
 from os.path import basename
 
-from common import get_paths, set_tag, read_tag, ALLOWED_TAGS
+from common import ALLOWED_TAGS, TagDoesNotExist, get_paths, read_tag, set_tag
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s: %(message)s'
+)
 
 def change_tag(path: str, key: str, value: str) -> None:
-    old_value = read_tag(path, key)
+    try:
+        old_value = read_tag(path, key)
+    except TagDoesNotExist:
+        old_value = '[None]'
+        logging.warning('Tag "{}" does not exist for "{}"'.format(key, basename(path)))
     set_tag(path, key, value)
     new_value = read_tag(path, key)
-    print('Changed "{}" from "{}" to "{}" for "{}"'.format(key, old_value, new_value, basename(path)))
+    logging.info('Changed "{}" from "{}" to "{}" for "{}"'.format(key, old_value, new_value, basename(path)))
 
 
 def validate_tag_name(tag_name: str):
